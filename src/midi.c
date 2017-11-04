@@ -28,7 +28,12 @@ void midiproc( uint8_t byte )
 			case 0x00:
 				dlim = 2;
 				break;
-				
+			
+			//Controller change
+			case 0x30:
+				dlim = 2;
+				break;
+			
 			//Program change
 			case 0x40:
 				dlim = 1;
@@ -59,6 +64,7 @@ void midiproc( uint8_t byte )
 				//Note on
 				case 0x10:
 					midi.note = dbuf[0];
+					midi.notevel = dbuf[1];
 					midi.noteon = 1;
 					break;
 					
@@ -67,6 +73,12 @@ void midiproc( uint8_t byte )
 					if ( midi.note == dbuf[0] )
 						midi.noteon = 0;
 					break;
+					
+				//Controller change
+				case 0x30:
+					midi.controllers[dbuf[0]] = dbuf[1];
+					break;
+					
 					
 				//Program change
 				case 0x40:
@@ -78,6 +90,7 @@ void midiproc( uint8_t byte )
 					midi.pitchbend = dbuf[0] | ( dbuf[1] << 7 );
 					break;
 					
+
 				default:
 					break;
 			}

@@ -28,7 +28,7 @@ int main( )
 	
 	envgen1.attack = 255;
 	envgen1.sustain = 255;
-	envgen1.release = 2;
+	envgen1.release = 20;
 	
 	while ( 1 )
 	{
@@ -38,6 +38,9 @@ int main( )
 		envgen1.keydn = midi.noteon;
 		ldsample( samples[midi.program], envgen1.value );
 		oscset( pgm_read_word( &notes[midi.note] ) );
+		envgen1.sustain = midi.notevel;
+		envgen1.attack = 255 - midi.controllers[1] * 2;
+		envgen1.release = 255 - midi.controllers[2] * 2;
 	}
 	
 	return 0;
