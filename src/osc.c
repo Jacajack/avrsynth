@@ -6,7 +6,7 @@
 #include "osc.h"
 
 //Samples
-const volatile PROGMEM uint8_t samples[SAMPLE_COUNT][SAMPLE_LEN] = 
+const volatile uint8_t PROGMEM samples[SAMPLE_COUNT][SAMPLE_LEN] = 
 {
 	{  0,   0,   0,   0,  0,   0,    0,   0, 255, 255, 255, 255, 255, 255, 255, 255}, //Square wave
 	{  0,  16,  32,  48,  64, 80,   96, 112, 128, 144, 160, 176, 192, 208, 224, 240}, //Saw wave
@@ -15,9 +15,7 @@ const volatile PROGMEM uint8_t samples[SAMPLE_COUNT][SAMPLE_LEN] =
 
 };
 
-
 //Oscillator variables
-volatile uint8_t noteon, notenum;
 volatile static uint8_t samplenum;
 volatile static uint8_t buffers[2][SAMPLE_LEN] = {{0}};
 volatile static uint8_t *outbuf = buffers[0], *genbuf = buffers[1];
@@ -29,6 +27,7 @@ ISR ( TIMER1_COMPA_vect )
 	if ( ++samplenum >= 16 ) samplenum = 0;
 }
 
+//Load sample (or change volume)
 void ldsample( const volatile uint8_t *sample, uint8_t vol )
 {
 	volatile static uint8_t *bufswap;
@@ -45,6 +44,14 @@ void ldsample( const volatile uint8_t *sample, uint8_t vol )
 	
 }
 
+//Set oscillator comparator value
+inline void oscset( uint16_t compv )
+{
+	OCR1A = compv;
+	if ( TCNT1 > compv ) TCNT1 = 0;
+}
+
+//Init osicllator
 void oscinit( )
 {
 	//DAC as output

@@ -5,10 +5,11 @@
 #define SAMPLE_LEN 16
 #define SAMPLE_COUNT 4
 
-extern const volatile PROGMEM uint8_t samples[][SAMPLE_LEN];
+extern const volatile uint8_t PROGMEM samples[][SAMPLE_LEN];
 extern volatile uint8_t noteon, notenum;
 
 extern void oscinit( );
+extern inline void oscset( uint16_t compv );
 extern void ldsample( const volatile uint8_t *sample, uint8_t vol );
 
 
