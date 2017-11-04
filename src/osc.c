@@ -33,9 +33,16 @@ void ldsample( const volatile uint8_t *sample, uint8_t vol )
 	volatile static uint8_t *bufswap;
 	static uint8_t i;
 	
+	/*
 	//Multiply the wave with volume (inline assembly! yay!)
 	for ( i = 0; i < SAMPLE_LEN; i++ )
 		HMUL( genbuf[i], pgm_read_byte( sample + i ), vol );
+	*/
+	
+	//Multiply the sample with proper volume
+	for ( i = 0; i < SAMPLE_LEN; i++ )
+		genbuf[i] = ( ( (uint16_t) pgm_read_byte( sample + i ) * vol ) >> 8 );
+	
 	
 	//Buffer swap
 	bufswap = outbuf;
@@ -45,7 +52,7 @@ void ldsample( const volatile uint8_t *sample, uint8_t vol )
 }
 
 //Set oscillator comparator value
-inline void oscset( uint16_t compv )
+void oscset( uint16_t compv )
 {
 	OCR1A = compv;
 	if ( TCNT1 > compv ) TCNT1 = 0;
@@ -59,11 +66,11 @@ void oscinit( )
 	PORTA = 0;
 
 	//Timer/counter 1 config
-	//Running at 20MHz
+	//Running at F_CPU
 	TCCR1A = 0;
 	TCCR1B = ( 1 << WGM12 ) | ( 1 << CS10 );
 	TCNT1 = 0;
 	OCR1A = 65535;
-	TIMSK = ( 1 << OCIE1A );
+	TIMSK |= ( 1 << OCIE1A );
 }
 

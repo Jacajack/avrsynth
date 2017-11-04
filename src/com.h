@@ -3,10 +3,10 @@
 #include <avr/io.h>
 #include <inttypes.h>
 
-#define comstatus( ) ( UCSRA & ( 1 << RXC ) )
-
 extern void cominit( uint32_t baud );
-extern uint8_t comrecv( );
+extern uint8_t comstatus( );
+extern uint8_t comrx( );
+extern uint8_t comtx( uint8_t b );
 
 #endif
 

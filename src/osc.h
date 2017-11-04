@@ -9,7 +9,7 @@ extern const volatile uint8_t PROGMEM samples[][SAMPLE_LEN];
 extern volatile uint8_t noteon, notenum;
 
 extern void oscinit( );
-extern inline void oscset( uint16_t compv );
+extern void oscset( uint16_t compv );
 extern void ldsample( const volatile uint8_t *sample, uint8_t vol );
 
 

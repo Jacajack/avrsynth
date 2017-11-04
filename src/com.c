@@ -14,9 +14,22 @@ void cominit( uint32_t baud )
     UCSRC = ( 1 << URSEL ) | ( 0 << USBS ) | ( 3 << UCSZ0 ); //Set data format - 8 bit data, 1 stop
 }
 
-//Receive character
-uint8_t comrecv( )
+uint8_t comstatus( )
 {
-	while ( !comstatus( ) );
+	return UCSRA & ( 1 << RXC );
+}
+
+//Receive character
+uint8_t comrx( )
+{
+	while ( !( UCSRA & ( 1 << RXC ) ) );
 	return UDR;
+}
+
+//Transmit character
+uint8_t comtx( uint8_t b )
+{
+	while ( !( UCSRA & ( 1 << UDRE ) ) );
+	UDR = b;
+	return b;
 }
