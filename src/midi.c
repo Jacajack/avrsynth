@@ -64,7 +64,7 @@ void midiproc( uint8_t byte )
 					
 				//Note off	
 				case 0x00:
-					//if ( midi.note == dbuf[0] )
+					if ( midi.note == dbuf[0] )
 						midi.noteon = 0;
 					break;
 					

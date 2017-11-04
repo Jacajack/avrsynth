@@ -20,23 +20,23 @@ int main( )
 	//Init synthesizer modules
 	oscinit( );
 	modinit( );
-	cominit( 9600 );
+	cominit( 31250 );
 	midi.channel = 0;
-	midi.note = 60;
-	
-	
-	ldsample( samples[3], 255 );
-	oscset( pgm_read_word( notes + 50 ) );
 	sei( );
 	
 	DDRB = 7;
 	
+	envgen1.attack = 255;
+	envgen1.sustain = 255;
+	envgen1.release = 2;
 	
 	while ( 1 )
 	{
 		if ( comstatus( ) )
 			midiproc( UDR );
 		
+		envgen1.keydn = midi.noteon;
+		ldsample( samples[midi.program], envgen1.value );
 		oscset( pgm_read_word( &notes[midi.note] ) );
 	}
 	

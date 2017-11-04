@@ -3,7 +3,7 @@
 #include <avr/pgmspace.h>
 
 #define SAMPLE_LEN 16
-#define SAMPLE_COUNT 4
+#define SAMPLE_COUNT 5
 
 extern const volatile uint8_t PROGMEM samples[][SAMPLE_LEN];
 extern volatile uint8_t noteon, notenum;

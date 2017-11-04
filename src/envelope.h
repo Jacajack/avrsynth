@@ -11,6 +11,6 @@ struct envgen
 	uint8_t keydn; //Is key pressed
 };
 
-extern void envupd( struct envgen *gen );
+extern uint8_t envupd( struct envgen *gen );
 
 #endif
