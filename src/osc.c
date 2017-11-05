@@ -46,7 +46,7 @@ const static volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
 #endif
 
 //Oscillator variables
-volatile static uint8_t samplenum, noise;
+volatile static uint8_t samplenum, noise, mute;
 volatile static uint8_t buffers[2][SAMPLE_LEN] = {{0}};
 volatile static uint8_t *outbuf = buffers[0], *genbuf = buffers[1];
 
@@ -63,14 +63,24 @@ static inline uint16_t noisegen( uint8_t vol )
 //The main sound generation interrupt
 ISR ( TIMER1_COMPA_vect )
 {
-	PORTA = outbuf[samplenum] + noisegen( noise );
+	if ( !mute )
+		PORTA = outbuf[samplenum] + noisegen( noise );
+	else
+		PORTA = 0;
+		
 	if ( ++samplenum >= SAMPLE_LEN ) samplenum = 0;
 }
 
 //Set noise volume
-void oscnoise( uint8_t vol )
+inline void oscnoise( uint8_t vol )
 {
 	noise = vol;
+}
+
+//Set mute
+inline void oscmute( uint8_t enable )
+{
+	mute = enable;
 }
 
 //Load sample (or change volume)
