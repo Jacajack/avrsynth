@@ -43,18 +43,25 @@ inline void ledpwm( uint8_t l1, uint8_t l2, uint8_t l3 )
 
 int main( )
 {
+	//LED init
+	DDRB = 7;
+
 	//Init synthesizer modules
 	oscinit( );
 	modinit( );
 	cominit( 31250 );
 	midiinit( 0 );
+	
+	//Init EGs
+	envgen0.attack = 0xffff;
+	envgen0.sustain = 0xffff;
+	envgen0.release = 0xffff;
+	envgen1.attack = 0xffff;
+	envgen1.sustain = 0xffff;
+	envgen1.release = 0xffff;
+	
+	//Enable interrupts
 	sei( );
-	
-	DDRB = 7;
-	
-	envgen0.attack = 255;
-	envgen0.sustain = 255;
-	envgen0.release = 20;
 	
 	while ( 1 )
 	{
@@ -66,10 +73,13 @@ int main( )
 		if ( midi.reset ) reset( );
 		
 		//Update EG1 params
-		envgen0.sustain = midi.notevel;
-		envgen0.attack = 255 - midi.controllers.sndctl4 * 2;
-		envgen0.release = 255 - midi.controllers.sndctl3 * 2;
+		envgen0.sustain = midi.notevel << 9;
+		envgen0.attack = ( 128 - midi.controllers.sndctl4 ) << 7;
+		envgen0.release = ( 128 - midi.controllers.sndctl3 ) << 7;
 		envgen0.keydn = midi.noteon;
+		
+		//Update EG2 params
+		envgen1.keydn = midi.noteon;
 		
 		//Update oscillator params
 		ldsample( samples[midi.program], envgen0.value );

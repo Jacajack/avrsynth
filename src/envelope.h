@@ -4,10 +4,18 @@
 
 struct envgen
 {
-	uint8_t attack; //Attack
-	uint8_t sustain; //Sustain
-	uint8_t release; //Release
-	uint8_t value; //Value
+	uint16_t attack; //Attack
+	uint16_t sustain; //Sustain
+	uint16_t release; //Release
+	union
+	{
+		uint16_t cnt;
+		struct __attribute__( ( packed ) )
+		{
+			uint8_t cntl;  //Counter low half
+			uint8_t value; //Value
+		};
+	};
 	uint8_t keydn; //Is key pressed
 };
 
