@@ -4,11 +4,30 @@
 
 struct midistatus midi = {0};
 
+void midiinit( uint8_t channel )
+{
+	uint8_t i;
+	
+	midi.channel = channel;
+	midi.program = 0;
+	midi.noteon = 0;
+	midi.notevel = 0;
+	midi.note = 0;
+	midi.pitchbend = 0;
+	midi.reset = 0;
+	
+	for ( i = 0; i < 128; i++ )
+		midi.controllers.raw[i] = 0;
+}
+
 void midiproc( uint8_t byte )
 {
 	static uint8_t channel = 0, status = 0, dlim = 0, dread = 0;
 	static uint8_t dbuf[16] = {0};
-		
+	
+	//Handle synthesizer reset
+	if ( byte == 0xff ) midi.reset = 1;
+	
 	if ( byte & ( 1 << 7 ) ) //Handle status bytes
 	{
 		//Extract information from status byte
@@ -57,7 +76,7 @@ void midiproc( uint8_t byte )
 		dbuf[dread++] = byte;
 		
 		//Interpret command
-		if ( dread == dlim )
+		if ( dread >= dlim )
 		{
 			switch ( status )
 			{
@@ -76,7 +95,7 @@ void midiproc( uint8_t byte )
 					
 				//Controller change
 				case 0x30:
-					midi.controllers[dbuf[0]] = dbuf[1];
+					midi.controllers.raw[dbuf[0]] = dbuf[1];
 					break;
 					
 					
