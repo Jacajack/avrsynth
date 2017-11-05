@@ -1,49 +1,60 @@
+#include <stddef.h>
 #include <inttypes.h>
 #include "midi.h"
 
 void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 {
+	uint8_t dlim, dcnt, status;
+	
+	//Null pointer check
+	if ( midi == NULL ) return;
+	
+	//Get configuration from the struct
+	dlim = midi->dlim;
+	dcnt = midi->dcnt;
+	status = midi->status;
+	
 	//Handle synthesizer reset
 	if ( byte == 0xff ) midi->reset = 1;
 	
 	if ( byte & ( 1 << 7 ) ) //Handle status bytes
 	{
 		//Extract information from status byte
-		midi->status = byte & 0x70;
-		midi->dcnt = midi->dlim = 0;
+		status = byte & 0x70;
+		dcnt = dlim = 0;
 		midi->channel = byte & 0x0f;
 
 		//Check data length for each MIDI command
-		switch ( midi->status )
+		switch ( status )
 		{
 			//Note on
 			case 0x10:
-				midi->dlim = 2;
+				dlim = 2;
 				break;
 				
 			//Note off
 			case 0x00:
-				midi->dlim = 2;
+				dlim = 2;
 				break;
 			
 			//Controller change
 			case 0x30:
-				midi->dlim = 2;
+				dlim = 2;
 				break;
 			
 			//Program change
 			case 0x40:
-				midi->dlim = 1;
+				dlim = 1;
 				break;
 				
 			//Pitch
 			case 0x60:
-				midi->dlim = 2;
+				dlim = 2;
 				break;
 			
 			//Uknown command
 			default:
-				midi->dlim = 0;
+				dlim = 0;
 				break;
 				
 		}
@@ -51,12 +62,12 @@ void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 	else if ( midi->channel == channel ) //Handle data bytes
 	{
 		//Data byte
-		midi->dbuf[midi->dcnt++] = byte;
+		midi->dbuf[dcnt++] = byte;
 		
 		//Interpret command
-		if ( midi->dcnt >= midi->dlim )
+		if ( dcnt >= dlim )
 		{
-			switch ( midi->status )
+			switch ( status )
 			{
 				//Note on
 				case 0x10:
@@ -91,8 +102,13 @@ void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 					break;
 			}
 			
-			midi->dcnt = 0;
+			dcnt = 0;
 		}
 		
 	}
+	
+	//Write config back to the struct
+	midi->dlim = dlim;
+	midi->dcnt = dcnt;
+	midi->status = status;
 }

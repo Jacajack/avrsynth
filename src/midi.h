@@ -4,18 +4,22 @@
 
 struct midistatus
 {
+	//Temporary interpretation data
 	uint8_t dlim;
 	uint8_t dcnt;
 	uint8_t status;
 	uint8_t channel;
 	uint8_t dbuf[4];
 	
+	//Basic MIDI controls
 	uint8_t program;
 	uint8_t noteon;
 	uint8_t notevel;
 	uint8_t note;
 	uint16_t pitchbend;
 	uint8_t reset;
+	
+	//The controller list along with interpretations
 	union
 	{
 		struct __attribute__( ( packed ) )
