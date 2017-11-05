@@ -10,6 +10,11 @@
 #include "com.h"
 #include "midi.h"
 
+#ifndef NOTE_LIM
+#warning NOTE_LIM not set! Synthesizer may be sluggish on higher frequencies.
+#define NOTE_LIM 128
+#endif
+
 //Midi channels
 struct midistatus midi0 = {0}, midi10 = {0};
 
@@ -85,8 +90,17 @@ int main( )
 		
 		//Update oscillator params
 		ldsample( midi0.program, envgen0.value );
-		oscset( pgm_read_word( &notes[midi0.note] ) );
-		
+		if ( midi0.note > NOTE_LIM )
+		{
+			oscmute( 1 );
+			oscset( pgm_read_word( &notes[0] ) );
+		}
+		else
+		{
+			oscmute( 0 );
+			oscset( pgm_read_word( &notes[midi0.note] ) );
+		}
+			
 		//Light up LED's proportionally to EG1, EG2 and LFO
 		ledpwm( envgen0.value, envgen1.value, 128 );
 	}
