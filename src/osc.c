@@ -40,13 +40,13 @@ const static volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
 	{  0,   4,   8,  12,  16,  20,  24,  28,  32,  36,  40,  44,  48,  52,  56,  62,  //The weird ATARI wave
 	 255, 240, 225, 211, 199, 190, 182, 177, 175, 176, 180, 185, 193, 203, 214, 225},
 	 
-	{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,  //PWM 1/8
-	 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 128,   0,   0,   0,   0, 128}, 
+	{  0,   0, 128, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,  //PWM 1/8
+	 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 128, 255, 255, 128,   0,   0}, 
 };
 #endif
 
 //Oscillator variables
-volatile static uint8_t samplenum, noise, mute;
+volatile static uint8_t samplenum, sampleskip = 1, noise, mute;
 volatile static uint8_t buffers[2][SAMPLE_LEN] = {{0}};
 volatile static uint8_t *outbuf = buffers[0], *genbuf = buffers[1];
 
@@ -68,7 +68,7 @@ ISR ( TIMER1_COMPA_vect )
 	else
 		PORTA = 0;
 		
-	if ( ++samplenum >= SAMPLE_LEN ) samplenum = 0;
+	if ( ( samplenum += sampleskip ) >= SAMPLE_LEN ) samplenum = 0;
 }
 
 //Set noise volume
@@ -110,10 +110,12 @@ void ldsample( uint8_t num, uint8_t vol )
 	
 }
 
-//Set oscillator comparator value
-void oscset( uint16_t compv )
+//Set oscillator comparator value and sample skip
+void oscset( uint16_t compv, uint8_t skip )
 {
+	compv <<= skip;
 	OCR1A = compv;
+	sampleskip = 1 << skip;
 	if ( TCNT1 > compv ) TCNT1 = 0;
 }
 

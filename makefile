@@ -1,6 +1,5 @@
 F_CPU = 20000000UL
 SAMPLE_LEN = 32
-NOTE_LIM = 95
 MCU = atmega32
 
 CC = avr-gcc
