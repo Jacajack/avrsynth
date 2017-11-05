@@ -6,7 +6,12 @@
 #include "osc.h"
 
 //Samples
-const volatile uint8_t PROGMEM samples[SAMPLE_COUNT][SAMPLE_LEN] = 
+#ifndef SAMPLE_LEN
+#error SAMPLE_LEN must be defined in order to load proper sample table!
+#else
+const volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
+#endif
+#if SAMPLE_LEN == 16
 {
 	{  0,   0,   0,   0,  0,   0,    0,   0, 255, 255, 255, 255, 255, 255, 255, 255}, //Square wave
 	{  0,  16,  32,  48,  64, 80,   96, 112, 128, 144, 160, 176, 192, 208, 224, 240}, //Saw wave
@@ -15,6 +20,19 @@ const volatile uint8_t PROGMEM samples[SAMPLE_COUNT][SAMPLE_LEN] =
 	{255, 229, 207, 194, 191, 200, 217, 242,  13,  38,  55,  64,  61,  48,  26,   0}, //Some ATARI wave I'm trying to recreate
 
 };
+#endif
+#if SAMPLE_LEN == 32
+{
+	{  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+	 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}, //Square wave
+	 
+	//{  0,  16,  32,  48,  64, 80,   96, 112, 128, 144, 160, 176, 192, 208, 224, 240}, //Saw wave
+	//{  0,  10,  37,  78, 127, 176, 217, 244, 254, 244, 217, 176, 127,  78,  37,  10}, //Sine wave
+	//{128, 160, 192, 224, 255, 224, 192, 160, 128,  96,  64,  32,   0,  32,  64,  96}, //Triangle
+	//{255, 229, 207, 194, 191, 200, 217, 242,  13,  38,  55,  64,  61,  48,  26,   0}, //Some ATARI wave I'm trying to recreate
+
+};
+#endif
 
 //Oscillator variables
 volatile static uint8_t samplenum;
@@ -25,7 +43,7 @@ volatile static uint8_t *outbuf = buffers[0], *genbuf = buffers[1];
 ISR ( TIMER1_COMPA_vect )
 {
 	PORTA = outbuf[samplenum];
-	if ( ++samplenum >= 16 ) samplenum = 0;
+	if ( ++samplenum >= SAMPLE_LEN ) samplenum = 0;
 }
 
 //Load sample (or change volume)

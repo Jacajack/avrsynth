@@ -2,10 +2,13 @@
 #define OSC_H
 #include <avr/pgmspace.h>
 
-#define SAMPLE_LEN 16
-#define SAMPLE_COUNT 5
-
+#ifndef SAMPLE_LEN
+#error SAMPLE_LEN must be defined in order to load proper sample table!
+#else
 extern const volatile uint8_t PROGMEM samples[][SAMPLE_LEN];
+#define SAMPLE_COUNT ( sizeof( samples ) / sizeof( samples[0] ) )
+#endif
+
 extern volatile uint8_t noteon, notenum;
 
 extern void oscinit( );
