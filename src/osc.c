@@ -9,7 +9,7 @@
 #ifndef SAMPLE_LEN
 #error SAMPLE_LEN must be defined in order to load proper sample table!
 #else
-const volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
+const static volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
 #endif
 #if SAMPLE_LEN == 16
 {
@@ -46,22 +46,41 @@ const volatile uint8_t PROGMEM samples[][SAMPLE_LEN] =
 #endif
 
 //Oscillator variables
-volatile static uint8_t samplenum;
+volatile static uint8_t samplenum, noise;
 volatile static uint8_t buffers[2][SAMPLE_LEN] = {{0}};
 volatile static uint8_t *outbuf = buffers[0], *genbuf = buffers[1];
+
+static inline uint16_t noisegen( uint8_t vol )
+{
+	static uint16_t lfsr = 0xace1u;
+	static uint8_t bit;
+	
+	bit = ( ( lfsr >> 0 ) ^ ( lfsr >> 2 ) ^ ( lfsr >> 3 ) ^ ( lfsr >> 5 ) ) & 1;
+	lfsr = ( lfsr >> 1 ) | ( bit << 15 );
+	return ( ( lfsr & 0xff ) * vol ) >> 8;
+} 
 
 //The main sound generation interrupt
 ISR ( TIMER1_COMPA_vect )
 {
-	PORTA = outbuf[samplenum];
+	PORTA = outbuf[samplenum] + noisegen( noise );
 	if ( ++samplenum >= SAMPLE_LEN ) samplenum = 0;
 }
 
-//Load sample (or change volume)
-void ldsample( const volatile uint8_t *sample, uint8_t vol )
+//Set noise volume
+void oscnoise( uint8_t vol )
 {
+	noise = vol;
+}
+
+//Load sample (or change volume)
+void ldsample( uint8_t num, uint8_t vol )
+{
+	const volatile static uint8_t *sample;
 	volatile static uint8_t *bufswap;
 	static uint8_t i;
+
+	sample = samples[num];
 	
 	/*
 	//Multiply the wave with volume (inline assembly! yay!)
@@ -74,7 +93,7 @@ void ldsample( const volatile uint8_t *sample, uint8_t vol )
 		genbuf[i] = ( ( (uint16_t) pgm_read_byte( sample + i ) * vol ) >> 8 );
 	
 	
-	//Buffer swap
+	//Swap buffers
 	bufswap = outbuf;
 	outbuf = genbuf;
 	genbuf = bufswap;

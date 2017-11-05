@@ -4,7 +4,11 @@
 
 struct midistatus
 {
-	uint8_t channel;
+	uint8_t dlim;
+	uint8_t dcnt;
+	uint8_t status;
+	uint8_t dbuf[4];
+	
 	uint8_t program;
 	uint8_t noteon;
 	uint8_t notevel;
@@ -148,9 +152,6 @@ struct midistatus
 	} controllers;
 };
 
-extern struct midistatus midi;
-
-extern void midiinit( uint8_t channel );
-extern void midiproc( uint8_t byte );
+extern void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel );
 
 #endif

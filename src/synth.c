@@ -10,6 +10,9 @@
 #include "com.h"
 #include "midi.h"
 
+//Midi channels
+struct midistatus midi0 = {0}, midi10 = {0};
+
 //Reset routine
 void reset( )
 {
@@ -50,7 +53,6 @@ int main( )
 	oscinit( );
 	modinit( );
 	cominit( 31250 );
-	midiinit( 0 );
 	
 	//Init EGs
 	envgen0.attack = 0xffff;
@@ -67,23 +69,23 @@ int main( )
 	{
 		//Receive MIDI command
 		if ( comstatus( ) )
-			midiproc( UDR );
+			midiproc( &midi0, UDR, 0 );
 			
 		//Handle MIDI reset	
-		if ( midi.reset ) reset( );
+		if ( midi0.reset ) reset( );
 		
 		//Update EG1 params
-		envgen0.sustain = midi.notevel << 9;
-		envgen0.attack = ( 128 - midi.controllers.sndctl4 ) << 7;
-		envgen0.release = ( 128 - midi.controllers.sndctl3 ) << 7;
-		envgen0.keydn = midi.noteon;
+		envgen0.sustain = midi0.notevel << 9;
+		envgen0.attack = ( 128 - midi0.controllers.sndctl4 ) << 7;
+		envgen0.release = ( 128 - midi0.controllers.sndctl3 ) << 7;
+		envgen0.keydn = midi0.noteon;
 		
 		//Update EG2 params
-		envgen1.keydn = midi.noteon;
+		envgen1.keydn = midi0.noteon;
 		
 		//Update oscillator params
-		ldsample( samples[midi.program], envgen0.value );
-		oscset( pgm_read_word( &notes[midi.note] ) );
+		ldsample( midi0.program, envgen0.value );
+		oscset( pgm_read_word( &notes[midi0.note] ) );
 		
 		//Light up LED's proportionally to EG1, EG2 and LFO
 		ledpwm( envgen0.value, envgen1.value, 128 );
