@@ -6,7 +6,7 @@ CFLAGS = -Wall -Os
 
 all: clean force bin/synth.elf
 	
-bin/synth.elf: src/synth.c src/osc.c src/modulation.c src/envelope.c src/midi.c src/com.c
+bin/synth.elf: src/synth.c src/osc.c src/modulation.c src/envelope.c src/midi.c src/com.c src/notes.c
 	$(CC) $(CFLAGS) -DF_CPU=$(F_CPU) -mmcu=$(MCU) $^ -o $@
 	avr-size -C $@ --mcu=$(MCU)
 	
