@@ -7,6 +7,7 @@ struct midistatus
 	uint8_t dlim;
 	uint8_t dcnt;
 	uint8_t status;
+	uint8_t channel;
 	uint8_t dbuf[4];
 	
 	uint8_t program;

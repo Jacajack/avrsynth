@@ -1,4 +1,3 @@
-#include <avr/io.h>
 #include <inttypes.h>
 #include "midi.h"
 
@@ -12,6 +11,7 @@ void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 		//Extract information from status byte
 		midi->status = byte & 0x70;
 		midi->dcnt = midi->dlim = 0;
+		midi->channel = byte & 0x0f;
 
 		//Check data length for each MIDI command
 		switch ( midi->status )
@@ -48,7 +48,7 @@ void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 				
 		}
 	}
-	else if ( ( byte & 0x0f ) == channel ) //Handle data bytes
+	else if ( midi->channel == channel ) //Handle data bytes
 	{
 		//Data byte
 		midi->dbuf[midi->dcnt++] = byte;
