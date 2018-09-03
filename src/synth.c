@@ -78,8 +78,8 @@ int main( )
 		
 		//Update EG1 params
 		envgen0.sustain = midi0.notevel << 9;
-		envgen0.attack = ( 128 - midi0.controllers.sndctl4 ) << 7;
-		envgen0.release = ( 128 - midi0.controllers.sndctl3 ) << 7;
+		envgen0.attack = ( 128 - midi0.controllers.korg_attac ) << 7;
+		envgen0.release = ( 128 - midi0.controllers.korg_release ) << 7;
 		envgen0.keydn = midi0.noteon;
 		
 		//Update EG2 params
