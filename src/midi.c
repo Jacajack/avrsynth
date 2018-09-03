@@ -94,7 +94,7 @@ void midiproc( struct midistatus *midi, uint8_t byte, uint8_t channel )
 					
 				//Pitch
 				case 0x60:
-					midi->pitchbend = midi->dbuf[0] | ( midi->dbuf[1] << 7 );
+					midi->pitchbend = (int16_t)( midi->dbuf[0] | ( midi->dbuf[1] << 7 ) ) - 0x2000;
 					break;
 					
 

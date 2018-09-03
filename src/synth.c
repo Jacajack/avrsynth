@@ -93,7 +93,7 @@ int main( )
 		if ( midi0.note > 72 ) skipping = 1;
 		if ( midi0.note > 84 ) skipping = 2;
 		if ( midi0.note > 90 ) skipping = 3;
-		oscset( pgm_read_word( &notes[midi0.note] ), skipping );
+		oscset( pgm_read_word( &notes[midi0.note] ) - midi0.pitchbend, skipping );
 
 			
 		//Light up LED's proportionally to EG1, EG2 and LFO
