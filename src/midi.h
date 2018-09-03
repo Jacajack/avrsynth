@@ -24,6 +24,7 @@ struct midistatus
 	{
 		struct __attribute__( ( packed ) )
 		{
+			// 00 - 0F
 			uint8_t bank;
 			uint8_t modulation;
 			uint8_t breath;
@@ -40,10 +41,12 @@ struct midistatus
 			uint8_t fxctl2;
 			uint8_t cc14;
 			uint8_t cc15;
-			uint8_t cc16;
-			uint8_t cc17;
-			uint8_t cc18;
-			uint8_t cc19;
+			
+			// 0F - 1F
+			uint8_t korg_attac;
+			uint8_t korg_decay;
+			uint8_t korg_sustain;
+			uint8_t korg_release;
 			uint8_t cc20;
 			uint8_t cc21;
 			uint8_t cc22;
@@ -56,6 +59,7 @@ struct midistatus
 			uint8_t cc29;
 			uint8_t cc30;
 			uint8_t cc31;
+			
 			uint8_t c0lsb;
 			uint8_t c1lsb;
 			uint8_t c2lsb;
